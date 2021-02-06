@@ -139,6 +139,8 @@ def legacy_memory(memory):
 def main():
     global DEBUG
     import getopt
+    
+    import pdb;pdb.set_trace()
     filetype = None
     filename = None
     comPort = 0     # Default setting.

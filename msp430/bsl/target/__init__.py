@@ -18,6 +18,14 @@ import time
 import pkgutil
 from io import BytesIO
 
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(26, GPIO.OUT)
+GPIO.setup(19, GPIO.OUT)
+
+TEST_PIN = 26
+RST_PIN = 19
+
 from optparse import OptionGroup
 import msp430.target
 import msp430.memory
@@ -213,9 +221,9 @@ class SerialBSL(bsl.BSL):
             level = not level
         # set pin level
         if self.swapResetTest:
-            self.serial.setRTS(level)
+            GPIO.output(TEST_PIN, GPIO.HIGH if level == True else GPIO.LOW)
         else:
-            self.serial.setDTR(level)
+            GPIO.output(RST_PIN, GPIO.HIGH if level == True else GPIO.LOW)
         time.sleep(self.control_delay)
 
     def set_TEST(self, level=True):
@@ -232,9 +240,9 @@ class SerialBSL(bsl.BSL):
         else:
             # set pin level
             if self.swapResetTest:
-                self.serial.setDTR(level)
+                GPIO.output(RST_PIN, GPIO.HIGH if level == True else GPIO.LOW)
             else:
-                self.serial.setRTS(level)
+                GPIO.output(TEST_PIN, GPIO.HIGH if level == True else GPIO.LOW)
         time.sleep(self.control_delay)
 
     def set_baudrate(self, baudrate):
@@ -513,5 +521,6 @@ class SerialBSLTarget(SerialBSL, msp430.target.Target):
 
 def main():
     # run the main application
+    import pdb;pdb.set_trace()
     bsl_target = SerialBSLTarget()
     bsl_target.main()

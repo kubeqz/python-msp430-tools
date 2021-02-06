@@ -20,6 +20,14 @@ from io import BytesIO
 import serial
 from msp430.memory import Memory
 
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(26, GPIO.OUT)        
+GPIO.setup(19, GPIO.OUT)
+
+TEST_PIN = 26
+RST_PIN = 19
+
 DEBUG = 0
 
 # copy of the patch file provided by TI
@@ -488,9 +496,9 @@ class LowLevel:
             level = not level
         # set pin level
         if self.swapResetTest:
-            self.serialport.setRTS(level)
+            GPIO.output(TEST_PIN, GPIO.HIGH if level == 1 else GPIO.LOW)
         else:
-            self.serialport.setDTR(level)
+            GPIO.output(RST_PIN, GPIO.HIGH if level == 1 else GPIO.LOW)
         # add some delay
         if self.slowmode:
             time.sleep(0.200)
@@ -504,9 +512,9 @@ class LowLevel:
             level = not level
         # set pin level
         if self.swapResetTest:
-            self.serialport.setDTR(level)
+            GPIO.output(RST_PIN, GPIO.HIGH if level == 1 else GPIO.LOW)
         else:
-            self.serialport.setRTS(level)
+            GPIO.output(TEST_PIN, GPIO.HIGH if level == 1 else GPIO.LOW)
         # make TEST signal on TX pin, unsing break condition.
         # currently only working on win32!
         if self.testOnTX:
